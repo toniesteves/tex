@@ -19,6 +19,10 @@ fn launch_paths() -> Vec<String> {
 }
 
 fn main() {
+    // WebKitGTK's DMA-BUF renderer flickers on hover with NVIDIA drivers; the older path does not.
+    if std::env::var_os("WEBKIT_DISABLE_DMABUF_RENDERER").is_none() {
+        std::env::set_var("WEBKIT_DISABLE_DMABUF_RENDERER", "1");
+    }
     let app = tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
         .manage(compile::Compiler::default())

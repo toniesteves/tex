@@ -10,7 +10,7 @@ import { icon } from "./icons";
 
 type Tab = "general" | "editor" | "tex" | "shortcuts" | "about";
 const TABS: [Tab, string][] = [["general", "General"], ["editor", "Editor"], ["tex", "TeX"], ["shortcuts", "Shortcuts"], ["about", "About"]];
-const WEBSITE = "https://toniesteves.github.io/tex/";
+const WEBSITE = "https://toniesteves.github.io/tex-editor/";
 
 /** True while a shortcut is being recorded (global shortcuts are paused). */
 export let recording = false;

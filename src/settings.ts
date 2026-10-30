@@ -7,6 +7,12 @@ export interface Recent {
   path: string;
   name: string;
   opened: number;
+  tags?: string[];
+}
+
+export interface Tag {
+  name: string;
+  color: string;
 }
 
 export interface ProjectState {
@@ -44,6 +50,7 @@ export interface Settings {
   shortcuts: Record<string, string>;
   recentCommands: string[];
   recents: Recent[];
+  tags: Tag[];
   projects: Record<string, ProjectState>;
 }
 
@@ -70,6 +77,7 @@ const DEFAULTS: Settings = {
   shortcuts: {},
   recentCommands: [],
   recents: [],
+  tags: [],
   projects: {},
 };
 
@@ -127,8 +135,28 @@ class Store {
   }
 
   addRecent(path: string, name: string): void {
-    const recents = [{ path, name, opened: Date.now() }, ...this.value.recents.filter((r) => r.path !== path)];
-    this.set("recents", recents.slice(0, MAX_RECENTS));
+    const tags = this.value.recents.find((r) => r.path === path)?.tags;
+    const recents = [{ path, name, opened: Date.now(), tags }, ...this.value.recents.filter((r) => r.path !== path)];
+    // Tagged projects stay in the list; only the untagged ones are capped.
+    let untagged = 0;
+    this.set("recents", recents.filter((r) => r.tags?.length || ++untagged <= MAX_RECENTS));
+  }
+
+  toggleTag(path: string, tag: string): void {
+    this.set("recents", this.value.recents.map((r) => {
+      if (r.path !== path) return r;
+      const tags = r.tags ?? [];
+      return { ...r, tags: tags.includes(tag) ? tags.filter((t) => t !== tag) : [...tags, tag] };
+    }));
+  }
+
+  addTag(tag: Tag): void {
+    this.set("tags", [...this.value.tags.filter((t) => t.name !== tag.name), tag]);
+  }
+
+  deleteTag(name: string): void {
+    this.value.recents = this.value.recents.map((r) => ({ ...r, tags: r.tags?.filter((t) => t !== name) }));
+    this.set("tags", this.value.tags.filter((t) => t.name !== name));
   }
 
   removeRecent(path: string): void {

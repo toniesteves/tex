@@ -74,7 +74,7 @@ export function prompt(options: { title: string; label?: string; value?: string;
   return result;
 }
 
-export type MenuItem = { label: string; run: () => void; disabled?: boolean; danger?: boolean; checked?: boolean; shortcut?: string } | "-";
+export type MenuItem = { label: string; run: () => void; disabled?: boolean; danger?: boolean; checked?: boolean; shortcut?: string; color?: string } | "-";
 
 /** A context menu at a point (closes on any click, Esc or scroll). */
 export function menu(x: number, y: number, items: MenuItem[]): void {
@@ -105,7 +105,7 @@ export function menu(x: number, y: number, items: MenuItem[]): void {
           close();
           item.run();
         },
-      }, h("span", { class: "menu-check" }, item.checked ? "✓" : ""), h("span", { class: "menu-label" }, item.label), item.shortcut ? h("kbd", null, item.shortcut) : null),
+      }, h("span", { class: "menu-check" }, item.checked ? "✓" : ""), item.color ? h("span", { class: "tag-dot", style: `background: ${item.color}` }) : null, h("span", { class: "menu-label" }, item.label), item.shortcut ? h("kbd", null, item.shortcut) : null),
     );
   }
   document.body.append(el);

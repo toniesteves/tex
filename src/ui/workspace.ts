@@ -59,7 +59,7 @@ export class Workspace {
     this.split.append(editorPane, divider, this.pdfPane);
     this.el.append(
       this.sidebar.el,
-      h("div", { class: "main" }, h("header", { class: "toolbar" }, this.title, this.tools), this.tabs, this.banners, this.split, this.issues.el, this.status),
+      h("div", { class: "main" }, h("header", { class: "toolbar" }, Object.assign(this.button("file.closeProject", "home", t("Close Project")), { className: "tool home" }), this.title, this.tools), this.tabs, this.banners, this.split, this.issues.el, this.status),
     );
     this.resizable(divider);
     this.resizableSidebar();

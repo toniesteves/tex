@@ -3403,7 +3403,7 @@ dependencies = [
 
 [[package]]
 name = "tex-editor"
-version = "0.1.10"
+version = "0.1.18"
 dependencies = [
  "libc",
  "notify",
