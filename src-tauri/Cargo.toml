@@ -1,0 +1,31 @@
+[package]
+name = "tex-editor"
+version = "0.1.2"
+description = "Tex: a light LaTeX editor for Linux"
+edition = "2021"
+rust-version = "1.90"
+license = "MIT"
+
+[build-dependencies]
+tauri-build = { version = "2.7", features = [] }
+
+[dependencies]
+tauri = { version = "2.12", features = [] }
+tauri-plugin-dialog = "2.8"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+notify = "8"
+libc = "0.2"
+
+# Debug info for dependencies costs a lot of memory at link time and is rarely useful.
+[profile.dev]
+debug = "line-tables-only"
+
+[profile.dev.package."*"]
+debug = false
+
+[profile.release]
+lto = "thin"
+opt-level = "s"
+strip = true
+panic = "abort"
