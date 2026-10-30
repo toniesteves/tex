@@ -13,7 +13,7 @@ import { basename, dirname, h, joinPath } from "../util";
 import { alert, ask, menuBelow, prompt, toast } from "./dialogs";
 import { fileIcon, icon } from "./icons";
 import { IssuesPanel } from "./issues";
-import { Sidebar, type FileActions } from "./sidebar";
+import { Sidebar, type FileActions, type SidebarMode } from "./sidebar";
 
 const ENGINE_NAMES: Record<ipc.Engine, string> = { pdflatex: "pdfLaTeX", xelatex: "XeLaTeX", lualatex: "LuaLaTeX" };
 
@@ -323,7 +323,7 @@ export class Workspace {
     settings.updateProject(this.project.root, { sidebarHidden: !hidden });
   }
 
-  showSidebar(mode: "files" | "outline"): void {
+  showSidebar(mode: SidebarMode): void {
     if (this.el.classList.contains("no-sidebar")) this.toggleSidebar();
     this.sidebar.show(mode);
   }

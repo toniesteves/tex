@@ -1,4 +1,5 @@
 // Small shared helpers: building DOM, POSIX paths, timers and events.
+import { locale } from "./i18n";
 
 type Child = Node | string | number | false | null | undefined;
 type Props = Record<string, unknown>;
@@ -22,6 +23,17 @@ export function h<K extends keyof HTMLElementTagNameMap>(
     if (child !== null && child !== undefined && child !== false) el.append(child instanceof Node ? child : String(child));
   }
   return el;
+}
+
+/** “5 minutes ago”, “yesterday”, then the date (`time` in milliseconds). */
+export function ago(time: number): string {
+  const format = new Intl.RelativeTimeFormat(locale, { numeric: "auto" });
+  const minutes = Math.round((time - Date.now()) / 60000);
+  if (Math.abs(minutes) < 60) return format.format(minutes, "minute");
+  const hours = Math.round(minutes / 60);
+  if (Math.abs(hours) < 24) return format.format(hours, "hour");
+  const days = Math.round(hours / 24);
+  return Math.abs(days) < 30 ? format.format(days, "day") : new Date(time).toLocaleDateString(locale);
 }
 
 export const basename = (p: string): string => p.slice(p.lastIndexOf("/") + 1);

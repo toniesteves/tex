@@ -6,7 +6,7 @@ import { ptBR } from "./i18n.pt-BR";
 const sources = import.meta.glob<string>(["./**/*.ts", "!./**/*.test.ts", "!./i18n.pt-BR.ts"], { query: "?raw", import: "default", eager: true });
 
 function usedKeys(): Set<string> {
-  const keys = new Set(["General", "Editor", "TeX", "Shortcuts"]);
+  const keys = new Set(["General", "Editor", "TeX", "Shortcuts", "About"]);
   const unescape = (s: string) => JSON.parse(`"${s}"`) as string;
   for (const [path, source] of Object.entries(sources)) {
     for (const m of source.matchAll(/\bt\(\s*"((?:[^"\\]|\\.)*)"/g)) keys.add(unescape(m[1]!));

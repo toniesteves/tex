@@ -14,6 +14,7 @@ import { t } from "./i18n";
 import * as ipc from "./ipc";
 import { isPresenting, reloadPresentation, startPresentation, stopPresentation } from "./present/controller";
 import { settings } from "./settings";
+import { cloneRepository } from "./ui/clone";
 import { alert, ask, isModalOpen, toast } from "./ui/dialogs";
 import { newProject } from "./ui/new-project";
 import { commandPalette, quickOpen } from "./ui/palette";
@@ -67,6 +68,7 @@ export class App {
       newProject: () => runCommand("file.newProject"),
       openFolder: () => runCommand("file.openFolder"),
       openFile: () => runCommand("file.openFile"),
+      cloneRepository: () => runCommand("file.clone"),
       openRecent: (path) => void this.openProject(path),
     }, this.home);
     this.root.replaceChildren(this.welcomeScreen.el);
@@ -186,6 +188,14 @@ export class App {
           if (typeof path === "string") await this.openPath(path);
         },
       }),
+      file({
+        id: "file.clone", title: "Clone Repository…",
+        run: async () => {
+          const recent = settings.get("recents")[0];
+          const folder = await cloneRepository(recent ? dirname(recent.path) : this.home ?? "/", this.home);
+          if (folder) await this.openProject(folder);
+        },
+      }),
       file({ id: "file.newFile", title: "New File…", keys: "Ctrl+N", enabled: hasProject, run: () => ws().fileActions().newFile(p().current ? dirname(p().current!) : p().root) }),
       file({ id: "file.newFolder", title: "New Folder…", enabled: hasProject, run: () => ws().fileActions().newFolder(p().current ? dirname(p().current!) : p().root) }),
       file({ id: "file.save", title: "Save", keys: "Ctrl+S", enabled: hasFile, run: () => p().saveCurrent() }),
@@ -216,6 +226,7 @@ export class App {
       view({ id: "view.sidebar", title: "Toggle Sidebar", keys: "Ctrl+Alt+B", enabled: hasProject, run: () => ws().toggleSidebar() }),
       view({ id: "view.files", title: "Show Files", enabled: hasProject, run: () => ws().showSidebar("files") }),
       view({ id: "view.outline", title: "Show Outline", enabled: hasProject, run: () => ws().showSidebar("outline") }),
+      view({ id: "view.git", title: "Show Git", enabled: hasProject, run: () => ws().showSidebar("git") }),
       view({ id: "view.pdf", title: "Toggle PDF Preview", keys: "Ctrl+Alt+P", enabled: hasProject, run: () => ws().togglePdf() }),
       view({ id: "view.issues", title: "Toggle Issues", keys: "Ctrl+Shift+M", enabled: hasProject, run: () => ws().toggleIssues() }),
       view({ id: "view.log", title: "Show Log", enabled: hasProject, run: () => ws().showLog() }),

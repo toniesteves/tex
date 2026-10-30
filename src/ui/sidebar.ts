@@ -1,11 +1,12 @@
-// The sidebar: the file tree (folders first, ★ on the main file, a dot on unsaved files) and the outline across the
-// included files (sections, frames and labels), with the file context menu.
+// The sidebar: the file tree (folders first, ★ on the main file, a dot on unsaved files), the outline across the
+// included files (sections, frames and labels), with the file context menu, and the Git panel.
 import { t } from "../i18n";
 import type { FileNode } from "../ipc";
 import type { OutlineNode } from "../latex/project-index";
 import type { Project } from "../project";
 import { dirname, h, isUnder } from "../util";
 import { menu, type MenuItem } from "./dialogs";
+import { GitPanel } from "./git";
 import { fileIcon, icon } from "./icons";
 
 export interface FileActions {
@@ -18,18 +19,23 @@ export interface FileActions {
   setMain(path: string | undefined): void;
 }
 
+export type SidebarMode = "files" | "outline" | "git";
+const MODES: SidebarMode[] = ["files", "outline", "git"];
+
 export class Sidebar {
   readonly el = h("aside", { class: "sidebar" });
   private body = h("div", { class: "sidebar-body" });
-  private mode: "files" | "outline" = "files";
+  private mode: SidebarMode = "files";
   private expanded = new Set<string>();
   private revealed = new Set<string>();
   private pressed: string | null = null;
   private segments: HTMLButtonElement[];
+  private git: GitPanel;
 
   constructor(private readonly project: Project, private readonly actions: FileActions) {
-    this.segments = (["files", "outline"] as const).map((mode) =>
-      h("button", { class: "segment", onclick: () => this.show(mode) }, mode === "files" ? t("Files") : t("Outline")),
+    this.git = new GitPanel(project);
+    this.segments = MODES.map((mode) =>
+      h("button", { class: "segment", onclick: () => this.show(mode) }, mode === "files" ? t("Files") : mode === "outline" ? t("Outline") : "Git"),
     );
     this.el.append(h("div", { class: "segmented" }, this.segments), this.body);
     this.body.addEventListener("contextmenu", (e) => {
@@ -51,16 +57,25 @@ export class Sidebar {
       this.render();
     });
     for (const event of ["tree", "tabs", "dirty", "index"] as const) project.events.on(event, () => this.render());
+    // Saves, pulls and git in a terminal change the status; the folder watcher skips .git, so focus refreshes it too.
+    project.events.on("tree", () => this.mode === "git" && void this.git.refresh());
+    window.addEventListener("focus", () => this.el.isConnected && this.mode === "git" && void this.git.refresh());
     this.show("files");
   }
 
-  show(mode: "files" | "outline"): void {
+  show(mode: SidebarMode): void {
     this.mode = mode;
-    this.segments.forEach((s, i) => s.classList.toggle("active", (i === 0) === (mode === "files")));
+    this.segments.forEach((s, i) => s.classList.toggle("active", MODES[i] === mode));
     this.render();
+    if (mode === "git") void this.git.refresh();
   }
 
   private render(): void {
+    if (this.mode === "git") {
+      // Kept in place, so the commit message keeps the focus.
+      if (this.git.el.parentNode !== this.body) this.body.replaceChildren(this.git.el);
+      return this.git.render();
+    }
     const scroll = this.body.scrollTop;
     if (this.mode === "files") {
       for (const tab of this.revealed) if (!this.project.tabs.includes(tab)) this.revealed.delete(tab);

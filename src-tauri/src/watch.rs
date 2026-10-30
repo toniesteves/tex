@@ -43,7 +43,9 @@ pub fn unwatch_project(state: tauri::State<'_, Watchers>, root: String) {
 fn forward(app: &AppHandle, root: &str, rx: &Receiver<notify::Result<Event>>) {
     while let Ok(first) = rx.recv() {
         let mut paths = BTreeSet::new();
-        let mut add = |event: notify::Result<Event>| paths.extend(event.map(|e| e.paths).unwrap_or_default());
+        // Opening a file is no change (and `git status` opens them all, which would refresh the Git panel forever).
+        let mut add =
+            |event: notify::Result<Event>| paths.extend(event.into_iter().filter(|e| !e.kind.is_access()).flat_map(|e| e.paths));
         add(first);
         while let Ok(event) = rx.recv_timeout(Duration::from_millis(150)) {
             add(event);

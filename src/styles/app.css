@@ -1,4 +1,5 @@
-/* Tex: one stylesheet. Light palette on :root, dark palette for the dark theme or the desktop's dark mode. */
+/* Tex: one stylesheet. Light palette on :root; the dark palette for the dark theme or, under System, the desktop's dark
+   mode; Monokai and Dracula. */
 
 :root {
   --font: "Inter", "Ubuntu", "Cantarell", system-ui, sans-serif;
@@ -6,6 +7,8 @@
   --accent: #0a84ff;
   --accent-strong: #0071e3;
   --accent-soft: rgba(10, 132, 255, 0.14);
+  /* Text on the accent colour. */
+  --on-accent: #fff;
   --bg: #ffffff;
   --bg-sidebar: #f3f3f6;
   --bg-raised: #ffffff;
@@ -71,7 +74,7 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
+  :root:not([data-theme]) {
     --bg: #1d1d20;
     --bg-sidebar: #252528;
     --bg-raised: #2c2c30;
@@ -102,6 +105,82 @@
   }
 }
 
+:root[data-theme="monokai"] {
+  --accent: #66d9ef;
+  --accent-strong: #4fc6de;
+  --accent-soft: rgba(102, 217, 239, 0.16);
+  --on-accent: #272822;
+  --bg: #272822;
+  --bg-sidebar: #1f201c;
+  --bg-raised: #33342d;
+  --bg-hover: rgba(255, 255, 255, 0.06);
+  --bg-active: rgba(255, 255, 255, 0.1);
+  --bg-pdf: #1a1b17;
+  --glass: rgba(51, 52, 45, 0.88);
+  --fg: #f8f8f2;
+  --fg-2: #cfcfc2;
+  --fg-3: #90908a;
+  --line: rgba(255, 255, 255, 0.08);
+  --line-strong: rgba(255, 255, 255, 0.16);
+  --error: #f92672;
+  --warning: #fd971f;
+  --ok: #a6e22e;
+  --info: #75715e;
+  --selection: #49483e;
+  --flash: rgba(230, 219, 116, 0.35);
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 3px 12px rgba(0, 0, 0, 0.3);
+  --hl-command: #66d9ef;
+  --hl-structure: #f92672;
+  --hl-environment: #a6e22e;
+  --hl-math: #ae81ff;
+  --hl-math-command: #fd971f;
+  --hl-reference: #e6db74;
+  --hl-comment: #75715e;
+  --hl-magic: #a59f85;
+  --hl-brace: #8f908a;
+  --hl-special: #f92672;
+  --hl-verbatim: #e6db74;
+  color-scheme: dark;
+}
+
+:root[data-theme="dracula"] {
+  --accent: #bd93f9;
+  --accent-strong: #a97ff2;
+  --accent-soft: rgba(189, 147, 249, 0.18);
+  --on-accent: #282a36;
+  --bg: #282a36;
+  --bg-sidebar: #21222c;
+  --bg-raised: #343746;
+  --bg-hover: rgba(255, 255, 255, 0.06);
+  --bg-active: rgba(255, 255, 255, 0.1);
+  --bg-pdf: #1e1f29;
+  --glass: rgba(52, 55, 70, 0.88);
+  --fg: #f8f8f2;
+  --fg-2: #c6c8d4;
+  --fg-3: #8b90ad;
+  --line: rgba(255, 255, 255, 0.08);
+  --line-strong: rgba(255, 255, 255, 0.16);
+  --error: #ff5555;
+  --warning: #ffb86c;
+  --ok: #50fa7b;
+  --info: #6272a4;
+  --selection: #44475a;
+  --flash: rgba(241, 250, 140, 0.3);
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 3px 12px rgba(0, 0, 0, 0.3);
+  --hl-command: #8be9fd;
+  --hl-structure: #ff79c6;
+  --hl-environment: #50fa7b;
+  --hl-math: #bd93f9;
+  --hl-math-command: #ffb86c;
+  --hl-reference: #f1fa8c;
+  --hl-comment: #6272a4;
+  --hl-magic: #a4a8c6;
+  --hl-brace: #6c7091;
+  --hl-special: #ff79c6;
+  --hl-verbatim: #f1fa8c;
+  color-scheme: dark;
+}
+
 *, *::before, *::after { box-sizing: border-box; }
 [hidden] { display: none !important; }
 html, body { margin: 0; height: 100%; overflow: hidden; }
@@ -127,7 +206,7 @@ input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px v
   height: 30px; padding: 0 14px; border-radius: 8px; border: 1px solid var(--line-strong); background: var(--bg-raised); color: var(--fg);
 }
 .dialog-buttons button:hover, .banner button:hover, .welcome-actions button:hover, .location button:hover, .shortcut-tools button:hover { background: var(--bg-hover); }
-button.primary { background: var(--accent); border-color: transparent; color: #fff; }
+button.primary { background: var(--accent); border-color: transparent; color: var(--on-accent); }
 button.primary:hover { background: var(--accent-strong) !important; }
 button.danger { color: var(--error); }
 .icon-button { border: 0; background: transparent; color: var(--fg-3); width: 24px; height: 24px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; }
@@ -160,6 +239,50 @@ button.danger { color: var(--error); }
 .outline .row .icon { color: var(--fg-3); }
 .outline .row.label { color: var(--fg-2); font-size: 12px; height: 24px; }
 
+/* ── Git panel ── */
+.git { display: flex; flex-direction: column; gap: 8px; padding-top: 2px; }
+.git.busy { cursor: progress; }
+.git-branch { display: flex; align-items: center; gap: 6px; padding: 0 4px; font-weight: 600; min-width: 0; }
+.git-branch .icon { color: var(--accent); }
+.git-branch .name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.git-sync { color: var(--fg-3); font-weight: 400; font-size: 12px; font-variant-numeric: tabular-nums; }
+.git-actions { display: flex; gap: 6px; }
+.git-button { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 7px; border: 1px solid var(--line-strong); background: var(--bg-raised); color: var(--fg); }
+.git-button:hover:not(:disabled) { background: var(--bg-hover); }
+.git-button:disabled { opacity: 0.5; }
+.git-button.wide { flex: none; }
+.git-button.discard { flex: none; color: var(--error); }
+.git-note { display: flex; gap: 6px; margin: 0; padding: 7px 8px; border-radius: 8px; background: var(--bg-raised); border: 1px solid var(--line); color: var(--fg-2); font-size: 12px; line-height: 1.4; }
+.git-note .icon { color: var(--warning); margin-top: 1px; }
+.commit-message { font: inherit; color: var(--fg); background: var(--bg); border: 1px solid var(--line-strong); border-radius: 7px; padding: 6px 9px; outline: none; resize: vertical; min-height: 52px; user-select: text; }
+.commit-message:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.git-heading { margin: 6px 4px 0; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--fg-3); }
+.git-change .git-dir { color: var(--fg-3); font-size: 12px; overflow: hidden; text-overflow: ellipsis; min-width: 0; flex: 0 1 auto; }
+.git-code { width: 14px; text-align: center; font-weight: 600; font-size: 12px; flex: none; color: var(--warning); }
+.git-change.added .git-code { color: var(--ok); }
+.git-change.deleted .git-code, .git-change.conflict .git-code { color: var(--error); }
+.git-change.deleted .name { text-decoration: line-through; color: var(--fg-2); }
+.git-change.renamed .git-code { color: var(--accent); }
+.git-toggle { display: flex; align-items: center; gap: 4px; border: 0; background: transparent; padding: 0; margin-bottom: -2px; }
+.git-toggle:hover { color: var(--fg-2); }
+.git-history { max-height: 220px; overflow: auto; border: 1px solid var(--line); border-radius: 8px; padding: 2px 0; flex: none; }
+.git-graph { display: block; flex: none; }
+.git-commit-summary { display: grid; grid-template-columns: var(--graph) minmax(0, 1fr); align-items: center; height: 36px; padding-right: 8px; }
+.git-commit-summary:hover { background: var(--bg-hover); }
+.git-commit.open .git-commit-summary { background: var(--bg-active); }
+.git-commit-text { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.git-commit-subject { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12.5px; }
+.git-commit-meta { display: flex; align-items: center; gap: 4px; min-width: 0; color: var(--fg-3); font-size: 11px; white-space: nowrap; }
+.git-commit-by { overflow: hidden; text-overflow: ellipsis; }
+.git-ref { flex: none; max-width: 90px; overflow: hidden; text-overflow: ellipsis; padding: 0 5px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-size: 10px; line-height: 15px; }
+.git-commit-details { position: relative; padding-left: var(--graph); }
+.git-commit-details > .git-graph { position: absolute; left: 0; top: 0; }
+.git-commit-body { display: flex; flex-direction: column; gap: 6px; padding: 6px 8px 8px 0; min-width: 0; }
+.git-commit-message { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; color: var(--fg-2); font-size: 12px; user-select: text; }
+.git-hash { align-self: flex-start; border: 0; border-radius: 4px; padding: 1px 6px; background: var(--bg-active); color: var(--fg-2); font: 11px var(--mono); }
+.git-hash:hover { color: var(--fg); }
+.git-commit-body .row { height: 24px; font-size: 12px; }
+
 .main { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
 .toolbar { display: flex; align-items: center; gap: 12px; padding: 10px 14px 6px 18px; }
 .title { display: flex; flex-direction: column; min-width: 0; flex: 1; }
@@ -170,9 +293,9 @@ button.danger { color: var(--error); }
 .tool { width: 32px; height: 30px; display: inline-flex; align-items: center; justify-content: center; border: 0; border-radius: 999px; background: transparent; color: var(--fg); }
 .tool:hover:not(:disabled) { background: var(--bg-hover); }
 .tool:disabled { opacity: 0.35; }
-.tool.primary { width: 46px; background: var(--accent); color: #fff; }
+.tool.primary { width: 46px; background: var(--accent); color: var(--on-accent); }
 .tool.primary:hover { background: var(--accent-strong); }
-.tool.active { background: var(--accent); color: #fff; }
+.tool.active { background: var(--accent); color: var(--on-accent); }
 .tool.active:hover:not(:disabled) { background: var(--accent-strong); }
 .tool.engine { width: auto; padding: 0 8px 0 12px; gap: 4px; font-size: 12px; }
 .tool.engine .icon { transform: rotate(90deg); color: var(--fg-3); }
@@ -231,7 +354,7 @@ li[aria-selected] .cm-completionDetail { color: rgba(255, 255, 255, 0.85); }
 .cm-diagnostic-warning { border-left: 4px solid var(--warning); }
 .cm-diagnostic-info { border-left: 4px solid var(--info); }
 .cm-lintRange-info { background-image: none; text-decoration: underline dotted var(--info); }
-.cm-fat-cursor { background: var(--accent) !important; color: #fff !important; }
+.cm-fat-cursor { background: var(--accent) !important; color: var(--on-accent) !important; }
 .cm-editor:not(.cm-focused) .cm-fat-cursor { background: none !important; outline: 1px solid var(--accent); }
 .cm-vim-panel { font-family: var(--mono); padding: 2px 8px; }
 .cm-vim-panel input { font-family: var(--mono); color: var(--fg); background: transparent; border: 0; outline: none; }
@@ -300,7 +423,7 @@ button.capsule:hover { color: var(--fg); background: var(--bg-hover); }
 .dialog-buttons { display: flex; justify-content: flex-end; gap: 8px; margin-top: 4px; }
 .menu { position: fixed; z-index: 120; min-width: 210px; max-width: 420px; padding: 5px; background: var(--bg-raised); border: 1px solid var(--line-strong); border-radius: 10px; box-shadow: var(--shadow-pop); display: flex; flex-direction: column; }
 .menu-item { display: flex; align-items: center; gap: 6px; border: 0; background: transparent; padding: 5px 10px 5px 6px; border-radius: 6px; text-align: left; white-space: nowrap; }
-.menu-item:hover:not(:disabled) { background: var(--accent); color: #fff; }
+.menu-item:hover:not(:disabled) { background: var(--accent); color: var(--on-accent); }
 .menu-item:disabled { opacity: 0.4; }
 .menu-item.danger { color: var(--error); }
 .menu-item.danger:hover { background: var(--error); color: #fff; }
@@ -318,14 +441,14 @@ button.capsule:hover { color: var(--fg); background: var(--bg-hover); }
 .palette-list { list-style: none; margin: 0; padding: 6px; max-height: 50vh; overflow: auto; }
 .palette-list:empty { display: none; }
 .palette-list li { display: flex; align-items: center; gap: 10px; padding: 7px 10px; border-radius: 8px; }
-.palette-list li.selected { background: var(--accent); color: #fff; }
+.palette-list li.selected { background: var(--accent); color: var(--on-accent); }
 .palette-list li.disabled { opacity: 0.45; }
 .palette-list .icon { color: var(--accent); }
-.palette-list li.selected .icon { color: #fff; }
+.palette-list li.selected .icon { color: var(--on-accent); }
 .palette-label { white-space: nowrap; }
 .palette-detail { flex: 1; color: var(--fg-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 12px; }
 .palette kbd { font: inherit; font-size: 12px; color: var(--fg-3); white-space: nowrap; }
-.palette-list li.selected .palette-detail, .palette-list li.selected kbd { color: rgba(255, 255, 255, 0.82); }
+.palette-list li.selected .palette-detail, .palette-list li.selected kbd { color: var(--on-accent); opacity: 0.82; }
 
 /* ── Welcome ── */
 .welcome { height: 100vh; display: grid; grid-template-columns: minmax(300px, 1fr) minmax(320px, 1.15fr); }
@@ -391,6 +514,12 @@ button.capsule:hover { color: var(--fg); background: var(--bg-hover); }
 .shortcut { min-width: 130px; height: 26px; border-radius: 6px; border: 1px solid var(--line-strong); background: var(--bg); font-family: var(--mono); font-size: 12px; }
 .shortcut.recording { border-color: var(--accent); color: var(--accent); }
 .shortcut-note { color: var(--warning); font-size: 12px; }
+.about { display: flex; flex-direction: column; align-items: center; gap: 6px; margin: auto; padding: 24px 0; text-align: center; }
+.about img { filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.2)); margin-bottom: 4px; }
+.about h3 { margin: 0; font-size: 20px; letter-spacing: -0.01em; }
+.about p { margin: 0; color: var(--fg-2); }
+.about .about-version { color: var(--fg-3); font-size: 12px; font-variant-numeric: tabular-nums; }
+.about .link { margin-top: 8px; }
 .link { border: 0; background: none; color: var(--accent); padding: 0 4px; text-decoration: underline; }
 
 /* ── Presentation windows (slides always on black) ── */

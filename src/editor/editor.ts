@@ -118,7 +118,7 @@ const appearance = EditorView.theme({
   ".cm-searchMatch": { backgroundColor: "rgba(245, 158, 11, 0.3)", outline: "none" },
   ".cm-searchMatch.cm-searchMatch-selected": { backgroundColor: "rgba(245, 158, 11, 0.6)" },
   ".cm-tooltip": { backgroundColor: "var(--bg-raised)", color: "var(--fg)", border: "1px solid var(--line-strong)" },
-  ".cm-tooltip-autocomplete > ul > li[aria-selected]": { backgroundColor: "var(--accent)", color: "#fff" },
+  ".cm-tooltip-autocomplete > ul > li[aria-selected]": { backgroundColor: "var(--accent)", color: "var(--on-accent)" },
   ".cm-panels": { backgroundColor: "var(--bg-sidebar)", color: "var(--fg)" },
   ".cm-panels.cm-panels-bottom": { borderTop: "1px solid var(--line)" },
   ".cm-panels.cm-panels-top": { borderBottom: "1px solid var(--line)" },

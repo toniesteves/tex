@@ -82,3 +82,46 @@ export const watchProject = (root: string) => invoke<void>("watch_project", { ro
 export const unwatchProject = (root: string) => invoke<void>("unwatch_project", { root });
 export const onFsChanged = (fn: (root: string, paths: string[]) => void): Promise<UnlistenFn> =>
   listen<{ root: string; paths: string[] }>("fs-changed", (e) => fn(e.payload.root, e.payload.paths));
+
+export interface GitChange {
+  path: string;
+  /** The two-letter code of `git status --porcelain`. */
+  code: string;
+}
+
+export interface GitStatus {
+  branch: string | null;
+  upstream: string | null;
+  ahead: number;
+  behind: number;
+  hasRemote: boolean;
+  merging: boolean;
+  changes: GitChange[];
+}
+
+export const gitStatus = (root: string) => invoke<GitStatus | null>("git_status", { root });
+export const gitInit = (root: string) => invoke<void>("git_init", { root });
+export const gitAddRemote = (root: string, url: string) => invoke<void>("git_add_remote", { root, url });
+export const gitCommit = (root: string, message: string) => invoke<void>("git_commit", { root, message });
+export const gitDiscard = (root: string) => invoke<void>("git_discard", { root });
+export const gitPush = (root: string) => invoke<void>("git_push", { root });
+export const gitPull = (root: string) => invoke<void>("git_pull", { root });
+export const gitClone = (url: string, parent: string) => invoke<string>("git_clone", { url, parent });
+
+export interface GitCommit {
+  hash: string;
+  parents: string[];
+  author: string;
+  /** Unix seconds. */
+  time: number;
+  refs: string[];
+  subject: string;
+}
+
+export interface GitCommitDetails {
+  message: string;
+  files: GitChange[];
+}
+
+export const gitLog = (root: string) => invoke<GitCommit[]>("git_log", { root });
+export const gitShow = (root: string, hash: string) => invoke<GitCommitDetails>("git_show", { root, hash });

@@ -18,11 +18,12 @@ export interface ProjectState {
   pdfHidden?: boolean;
   sidebarHidden?: boolean;
   sidebarWidth?: number;
+  historyClosed?: boolean;
 }
 
 export interface Settings {
   language: Language;
-  theme: "system" | "light" | "dark";
+  theme: "system" | "light" | "dark" | "monokai" | "dracula";
   engine: Engine;
   liveCompile: boolean;
   liveDelay: number;

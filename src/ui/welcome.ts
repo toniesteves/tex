@@ -1,25 +1,16 @@
-// The Welcome screen: new project, open folder or file, and the recent projects (with search when there are many).
-import { locale, t } from "../i18n";
+// The Welcome screen: new project, open folder or file, clone a repository, and the recent projects (with search when there are many).
+import { t } from "../i18n";
 import { detectTex } from "../ipc";
 import { settings } from "../settings";
-import { displayPath, h } from "../util";
+import { ago, displayPath, h } from "../util";
 import { icon } from "./icons";
 
 export interface WelcomeActions {
   newProject(): void;
   openFolder(): void;
   openFile(): void;
+  cloneRepository(): void;
   openRecent(path: string): void;
-}
-
-function ago(time: number): string {
-  const format = new Intl.RelativeTimeFormat(locale, { numeric: "auto" });
-  const minutes = Math.round((time - Date.now()) / 60000);
-  if (Math.abs(minutes) < 60) return format.format(minutes, "minute");
-  const hours = Math.round(minutes / 60);
-  if (Math.abs(hours) < 24) return format.format(hours, "hour");
-  const days = Math.round(hours / 24);
-  return Math.abs(days) < 30 ? format.format(days, "day") : new Date(time).toLocaleDateString(locale);
 }
 
 export function welcome(actions: WelcomeActions, home: string | null): { el: HTMLElement; destroy(): void } {
@@ -71,6 +62,7 @@ export function welcome(actions: WelcomeActions, home: string | null): { el: HTM
         h("button", { class: "primary", onclick: actions.newProject }, icon("plus"), t("New Project…")),
         h("button", { onclick: actions.openFolder }, icon("open"), t("Open Folder…")),
         h("button", { onclick: actions.openFile }, icon("file"), t("Open File…")),
+        h("button", { onclick: actions.cloneRepository }, icon("branch"), t("Clone Repository…")),
       ),
       tex,
     ),

@@ -1,7 +1,8 @@
-// Tex: a thin Tauri shell. Rust reads and writes files, runs latexmk and synctex, and watches folders; everything
+// Tex: a thin Tauri shell. Rust reads and writes files, runs latexmk, synctex and git, and watches folders; everything
 // that understands LaTeX lives in the TypeScript frontend.
 mod compile;
 mod files;
+mod git;
 mod synctex;
 mod watch;
 
@@ -39,6 +40,16 @@ fn main() {
             compile::cancel_compile,
             compile::clean_cache,
             compile::detect_tex,
+            git::git_status,
+            git::git_init,
+            git::git_add_remote,
+            git::git_commit,
+            git::git_discard,
+            git::git_push,
+            git::git_pull,
+            git::git_clone,
+            git::git_log,
+            git::git_show,
             synctex::synctex_forward,
             synctex::synctex_inverse,
             watch::watch_project,

@@ -1,14 +1,16 @@
-// Settings: General, Editor, TeX and Shortcuts. Changes apply at once and reach every window.
+// Settings: General, Editor, TeX, Shortcuts and About. Changes apply at once and reach every window.
+import { getVersion } from "@tauri-apps/api/app";
 import { allCommands, comboFromEvent, conflictFor, isShortcut, RESERVED, resetShortcuts, setShortcut, shortcutOf, type Command } from "../commands";
-import { setLanguage, t } from "../i18n";
-import { detectTex } from "../ipc";
+import { isPortuguese, setLanguage, t } from "../i18n";
+import { detectTex, openExternal } from "../ipc";
 import { applyTheme, settings, type Settings } from "../settings";
 import { h } from "../util";
 import { modal } from "./dialogs";
 import { icon } from "./icons";
 
-type Tab = "general" | "editor" | "tex" | "shortcuts";
-const TABS: [Tab, string][] = [["general", "General"], ["editor", "Editor"], ["tex", "TeX"], ["shortcuts", "Shortcuts"]];
+type Tab = "general" | "editor" | "tex" | "shortcuts" | "about";
+const TABS: [Tab, string][] = [["general", "General"], ["editor", "Editor"], ["tex", "TeX"], ["shortcuts", "Shortcuts"], ["about", "About"]];
+const WEBSITE = "https://toniesteves.github.io/tex/";
 
 /** True while a shortcut is being recorded (global shortcuts are paused). */
 export let recording = false;
@@ -52,7 +54,7 @@ function general(): HTMLElement[] {
       setLanguage(settings.get("language"));
       languageChanged();
     }),
-    choice("theme", t("Appearance"), [["system", t("System")], ["light", t("Light")], ["dark", t("Dark")]], applyTheme),
+    choice("theme", t("Appearance"), [["system", t("System")], ["light", t("Light")], ["dark", t("Dark")], ["monokai", "Monokai"], ["dracula", "Dracula"]], applyTheme),
     choice("engine", t("Default engine"), [["pdflatex", "pdfLaTeX"], ["xelatex", "XeLaTeX"], ["lualatex", "LuaLaTeX"]]),
     toggle("liveCompile", t("Compile while typing"), t("The PDF follows unsaved text; your files are not touched.")),
     number("liveDelay", t("Pause before compiling"), 0.3, 5, 0.1, 1000, t("s")),
@@ -159,13 +161,28 @@ function shortcutRow(command: Command, refresh: () => void): HTMLElement {
   return h("div", { class: "shortcut-row" }, h("span", null, t(command.title)), note, button, reset);
 }
 
+function about(): HTMLElement[] {
+  const version = h("p", { class: "about-version" });
+  void getVersion().then((v) => (version.textContent = t("Version {version}", { version: v })));
+  // The site picks its language from ?lang=, so it opens in the language of the app.
+  const site = `${WEBSITE}?lang=${isPortuguese() ? "pt" : "en"}`;
+  return [
+    h("div", { class: "about" },
+      h("img", { src: "/icon.png", alt: "", width: 80, height: 80 }),
+      h("h3", null, "Tex"),
+      version,
+      h("p", null, t("A light LaTeX editor for developers")),
+      h("button", { class: "link", onclick: () => void openExternal(site) }, WEBSITE.replace(/^https:\/\/|\/$/g, ""))),
+  ];
+}
+
 export function openSettings(initial: Tab = "general"): void {
   if (document.querySelector(".settings")) return;
   const body = h("div", { class: "settings-body" });
   const nav = h("nav", null);
   const show = (tab: Tab) => {
     nav.querySelectorAll("button").forEach((b) => b.classList.toggle("active", b.dataset.tab === tab));
-    body.replaceChildren(...{ general, editor, tex, shortcuts }[tab]());
+    body.replaceChildren(...{ general, editor, tex, shortcuts, about }[tab]());
   };
   for (const [tab, label] of TABS) nav.append(h("button", { dataset: { tab }, onclick: () => show(tab) }, t(label)));
   const box = h("div", { class: "dialog settings" }, h("h2", null, t("Settings")), h("div", { class: "settings-layout" }, nav, body),
