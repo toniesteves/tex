@@ -17,6 +17,7 @@ export interface ProjectState {
   split?: number;
   pdfHidden?: boolean;
   sidebarHidden?: boolean;
+  sidebarWidth?: number;
 }
 
 export interface Settings {

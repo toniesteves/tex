@@ -23,6 +23,8 @@ export class Sidebar {
   private body = h("div", { class: "sidebar-body" });
   private mode: "files" | "outline" = "files";
   private expanded = new Set<string>();
+  private revealed = new Set<string>();
+  private pressed: string | null = null;
   private segments: HTMLButtonElement[];
 
   constructor(private readonly project: Project, private readonly actions: FileActions) {
@@ -34,6 +36,19 @@ export class Sidebar {
       if (this.mode !== "files" || (e.target as HTMLElement).closest(".row")) return;
       e.preventDefault();
       menu(e.clientX, e.clientY, this.folderItems(project.root));
+    });
+    // The tree is rebuilt on every project event, and a rebuild between press and release swallows the click, so file
+    // rows match press and release by path instead.
+    const rowAt = (e: PointerEvent) => (e.target as HTMLElement).closest<HTMLElement>(".row[data-path]");
+    this.body.addEventListener("pointerdown", (e) => (this.pressed = e.button === 0 ? rowAt(e)?.dataset.path ?? null : null));
+    this.body.addEventListener("pointerup", (e) => {
+      const row = rowAt(e);
+      const pressed = this.pressed;
+      this.pressed = null;
+      if (e.button !== 0 || !row || row.dataset.path !== pressed) return;
+      if (row.dataset.dir === undefined) return void this.project.open(pressed);
+      if (!this.expanded.delete(pressed)) this.expanded.add(pressed);
+      this.render();
     });
     for (const event of ["tree", "tabs", "dirty", "index"] as const) project.events.on(event, () => this.render());
     this.show("files");
@@ -48,7 +63,10 @@ export class Sidebar {
   private render(): void {
     const scroll = this.body.scrollTop;
     if (this.mode === "files") {
+      for (const tab of this.revealed) if (!this.project.tabs.includes(tab)) this.revealed.delete(tab);
       for (const tab of this.project.tabs) {
+        if (this.revealed.has(tab)) continue;
+        this.revealed.add(tab);
         for (let dir = dirname(tab); isUnder(dir, this.project.root) && dir !== this.project.root; dir = dirname(dir)) this.expanded.add(dir);
       }
       this.body.replaceChildren(this.project.tree.length ? this.tree(this.project.tree, 0) : h("p", { class: "empty" }, t("This folder is empty.")));
@@ -70,12 +88,7 @@ export class Sidebar {
           class: `row${node.path === this.project.current ? " selected" : ""}`,
           style: `padding-left:${8 + depth * 14}px`,
           title: this.project.relative(node.path),
-          onclick: () => {
-            if (!node.isDir) return void this.project.open(node.path);
-            if (open) this.expanded.delete(node.path);
-            else this.expanded.add(node.path);
-            this.render();
-          },
+          dataset: node.isDir ? { path: node.path, dir: "" } : { path: node.path },
           oncontextmenu: (e: MouseEvent) => {
             e.preventDefault();
             menu(e.clientX, e.clientY, node.isDir ? this.folderItems(node.path) : this.fileItems(node.path));

@@ -64,6 +64,7 @@ export class Project {
   private compileDiagnostics: Diagnostic[] = [];
   private lintDiagnostics: Diagnostic[] = [];
   private detectedMain: string | undefined;
+  private lastMain: string | undefined;
   private live = new Debouncer(() => void this.compile("live"));
   private reindex = new Debouncer(() => void this.rebuildIndex());
   private follow = new Debouncer(() => void this.showInPdf({ quiet: true }));
@@ -88,6 +89,9 @@ export class Project {
     if (first) await this.open(first);
     await ipc.watchProject(this.root);
     this.unlisten = await ipc.onFsChanged((root, paths) => root === this.root && void this.fsChanged(paths));
+    // Switching tabs can switch the root file (a standalone document, or a `% !TEX root`).
+    this.lastMain = this.mainFile;
+    this.events.on("tabs", () => this.mainFile !== this.lastMain && this.afterMainChange());
     void this.rebuildIndex();
     if (settings.get("liveCompile")) void this.compile("live");
   }
@@ -291,12 +295,16 @@ export class Project {
 
   // ── Root file and engine ────────────────────────────────────────────────────────────────────────────────────────
 
-  /** The file to compile: a `% !TEX root` in the current file, else the chosen main file, else the detected one. */
+  /** The file to compile: a `% !TEX root` in the current file, else the current file when it has a `\documentclass`,
+   *  else the chosen main file, else the detected one. */
   get mainFile(): string | undefined {
     const current = this.current;
-    const magic = current && extname(current) === "tex" ? /^\s*%\s*!\s*TeX\s+root\s*=\s*(.+?)\s*$/im.exec(this.editor.text(current)?.split("\n", 20).join("\n") ?? "") : null;
+    const isTex = !!current && extname(current) === "tex";
+    const head = isTex ? this.editor.text(current)?.split("\n", 100) ?? [] : [];
+    const magic = /^\s*%\s*!\s*TeX\s+root\s*=\s*(.+?)\s*$/im.exec(head.slice(0, 20).join("\n"));
     const fromMagic = magic && current ? joinPath(dirname(current), magic[1]!) : undefined;
     if (fromMagic && this.files.includes(fromMagic)) return fromMagic;
+    if (isTex && this.files.includes(current) && /^[^%\n]*\\documentclass\b/m.test(head.join("\n"))) return current;
     const chosen = settings.project(this.root).main;
     return chosen && this.files.includes(chosen) ? chosen : this.detectedMain;
   }
@@ -307,6 +315,7 @@ export class Project {
   }
 
   private afterMainChange(): void {
+    this.lastMain = this.mainFile;
     this.events.emit("tabs", undefined);
     void this.rebuildIndex();
     if (settings.get("liveCompile")) this.live.schedule(50);

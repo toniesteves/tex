@@ -62,6 +62,7 @@ export class Workspace {
       h("div", { class: "main" }, h("header", { class: "toolbar" }, this.title, this.tools), this.tabs, this.banners, this.split, this.issues.el, this.status),
     );
     this.resizable(divider);
+    this.resizableSidebar();
     this.viewer.syncTrigger = settings.get("pdfSync");
     this.viewer.onSyncClick = (click) => void project.showSource(click);
     this.viewer.onChange = () => this.renderControls();
@@ -70,6 +71,7 @@ export class Workspace {
     this.el.classList.toggle("no-sidebar", !!state.sidebarHidden);
     this.split.classList.toggle("no-pdf", !!state.pdfHidden);
     this.split.style.setProperty("--split", String(state.split ?? 0.55));
+    if (state.sidebarWidth) this.el.style.setProperty("--sidebar-width", `${state.sidebarWidth}px`);
 
     project.events.on("tabs", () => (this.renderTabs(), this.renderTitle(), this.renderTools(), this.renderStatus()));
     project.events.on("dirty", () => (this.renderTabs(), this.renderStatus()));
@@ -291,6 +293,26 @@ export class Workspace {
       };
       divider.addEventListener("pointermove", move);
       divider.addEventListener("pointerup", up, { once: true });
+    });
+  }
+
+  private resizableSidebar(): void {
+    const handle = h("div", { class: "sidebar-handle", title: t("Drag to resize") });
+    this.sidebar.el.append(handle);
+    let width = 0;
+    handle.addEventListener("pointerdown", (e) => {
+      handle.setPointerCapture(e.pointerId);
+      const left = this.sidebar.el.getBoundingClientRect().left;
+      const move = (ev: PointerEvent) => {
+        width = Math.round(Math.min(600, Math.max(160, ev.clientX - left)));
+        this.el.style.setProperty("--sidebar-width", `${width}px`);
+      };
+      const up = () => {
+        handle.removeEventListener("pointermove", move);
+        if (width) settings.updateProject(this.project.root, { sidebarWidth: width });
+      };
+      handle.addEventListener("pointermove", move);
+      handle.addEventListener("pointerup", up, { once: true });
     });
   }
 
