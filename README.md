@@ -1,122 +1,182 @@
-# Tex
+<p align="center">
+  <img src="docs/assets/icon.png" width="128" height="128" alt="Tex app icon">
+</p>
 
-Um editor LaTeX leve, feito para desenvolvedores. Abra a pasta do seu documento e escreva: o PDF acompanha o texto
-enquanto você digita, os erros aparecem na linha certa do arquivo certo e um clique leva do PDF ao código (e de volta).
-Feito para Linux, com uma interface em português e inglês.
+<h1 align="center">Tex</h1>
 
-## Recursos
+<p align="center">
+  <b>A light LaTeX editor for developers.</b><br>
+  The PDF follows your unsaved text as you type, a click takes you from the PDF to the exact word in the source and back,
+  and every error is underlined on the line that caused it.
+</p>
 
-- **Projetos, não só arquivos.** Abra uma pasta (ou um `.tex`, que abre a pasta dele) ou comece por um modelo: Artigo,
-  Tese, Apresentação (Beamer), Notas de Matemática, Lista de Exercícios ou Em branco. Árvore de arquivos com menu de
-  contexto, abas, Abrir Rápido (Ctrl+P) e a estrutura do documento atravessando todos os arquivos incluídos, com os rótulos.
-- **Compilação ao vivo.** Cerca de um segundo depois de você parar de digitar, o PDF mostra o texto ainda **não salvo**,
-  sem tocar nos seus arquivos. Salvar (Ctrl+S) ou compilar (Ctrl+B) grava o PDF ao lado do arquivo principal. Nenhum
-  `.aux`, `.log` ou `.synctex.gz` vai parar na sua pasta.
-- **Arquivo principal e motor automáticos.** O arquivo principal vem do comentário `% !TEX root`, da sua escolha ou de uma
-  detecção automática; o motor (pdfLaTeX, XeLaTeX ou LuaLaTeX) vem do `% !TEX program`, da escolha do projeto ou do padrão.
-- **Erros no lugar certo.** Erros e avisos do TeX e do BibTeX sublinhados na linha certa, mais avisos imediatos de
-  referência indefinida, rótulo duplicado e citação fora da bibliografia. Painel de Problemas com filtro e o log completo.
-- **PDF integrado com SyncTeX nos dois sentidos, na palavra exata.** Clique duplo no PDF leva à palavra no código;
-  Ctrl+clique no código (ou Ctrl+Shift+J) destaca a palavra no PDF. O PDF recarrega sem piscar e mantém a posição, e os
-  links funcionam.
-- **Autocompletar.** Comandos, ambientes (`\begin{` já escreve o `\end`), `\end{` com o ambiente aberto primeiro, rótulos
-  em `\ref`, chaves em `\cite`, arquivos em `\input` e `\includegraphics`, pacotes, classes e os comandos e ambientes que
-  o próprio projeto define. Dentro de matemática, os comandos de matemática vêm primeiro.
-- **Apresentação Beamer (F5).** Com dois monitores, a plateia em tela cheia em um e a visão do apresentador no outro
-  (slide atual, próximo, notas do Beamer, cronômetro e relógio). Com um monitor, a tecla P mostra a visão do apresentador.
-- **Paleta de Comandos (Ctrl+Shift+P)** com tudo o que o app faz, e atalhos editáveis em Ajustes › Atalhos.
-- **Modo Vim** opcional, com `:w`, `:wa`, `:q`, `:x` e `:make`.
-- Contagem de palavras e páginas, tema claro e escuro (segue o sistema), interface em português e inglês (segue o sistema).
+<p align="center">
+  <a href="https://github.com/toniesteves/tex/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/toniesteves/tex?display_name=tag&sort=semver"></a>
+  <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-blue"></a>
+  <img alt="Platform: Linux" src="https://img.shields.io/badge/platform-Linux-informational">
+</p>
 
-## Instalação
+<p align="center">
+  <a href="https://github.com/toniesteves/tex/releases/latest"><img alt="Download Tex for Linux" src="https://img.shields.io/badge/Download%20for%20Linux-.deb-0A84FF?style=for-the-badge&logo=linux&logoColor=white"></a>
+</p>
 
-Baixe o pacote `.deb` e instale com o apt, que traz junto o que faltar (`latexmk` e o TeX Live básico):
+<p align="center">
+  <a href="https://github.com/toniesteves/tex/releases">Releases</a> ·
+  <a href="https://github.com/toniesteves/tex/issues">Issues</a> ·
+  <a href="LICENSE">License</a> ·
+  <a href="README.pt-BR.md">Português (Brasil)</a>
+</p>
 
-```sh
-sudo apt install ./Tex_0.1.1_amd64.deb
-```
+<p align="center">
+  <img src="docs/assets/screenshots/project.png" width="900" alt="A Tex project window: files and folders on the left, the LaTeX source in the middle and the live PDF on the right">
+</p>
 
-O **Tex** aparece no menu do sistema, em Escritório. Para desinstalar: `sudo apt remove tex`.
+---
 
-Se o pacote estiver numa partição que o apt não consegue ler como usuário comum (um disco NTFS, por exemplo), ele avisa
-que fez o download "sem isolamento". É inofensivo; para evitar o aviso, copie o `.deb` para `/tmp` antes de instalar.
+## Platforms
 
-Para bibliografias com biblatex e biber: `sudo apt install biber`. Pacotes LaTeX que faltarem vêm do apt
-(`texlive-latex-extra`, `texlive-science` e outros); no Debian e no Linux Mint o `tlmgr` não instala pacotes.
-
-## Uso
-
-Pelo menu, ou pelo terminal com uma pasta ou um arquivo:
-
-```sh
-tex-editor ~/tese
-tex-editor capitulo.tex
-```
-
-O executável se chama `tex-editor`, não `tex`, porque `tex` é o próprio TeX (`/usr/bin/tex`, do TeX Live).
-
-### Atalhos padrão
-
-| Ação | Atalho | Ação | Atalho |
+| Platform | Status | Technology | Download |
 |---|---|---|---|
-| Compilar (salva tudo e grava o PDF) | Ctrl+B | Paleta de Comandos | Ctrl+Shift+P |
-| Salvar / Salvar Tudo | Ctrl+S / Ctrl+Alt+S | Abrir Rápido | Ctrl+P |
-| Parar a compilação | Ctrl+. | Ajustes | Ctrl+, |
-| Mostrar no PDF | Ctrl+Shift+J | Localizar / Substituir | Ctrl+F / Ctrl+H |
-| Próximo / anterior problema | F8 / Shift+F8 | Ir para a linha | Ctrl+G |
-| Iniciar apresentação | F5 | Comentar/Descomentar | Ctrl+/ |
-| Mostrar/Ocultar o PDF | Ctrl+Alt+P | Sugestões | Ctrl+Space (ou Tab) |
-| Mostrar/Ocultar Problemas | Ctrl+Shift+M | Novo arquivo / Fechar aba | Ctrl+N / Ctrl+W |
-| Mostrar/Ocultar a barra lateral | Ctrl+Alt+B | Abrir pasta / Novo projeto | Ctrl+O / Ctrl+Shift+N |
-| Zoom do PDF | Ctrl+= / Ctrl+- / Ctrl+0 | Abas | Ctrl+Tab, Ctrl+1…9 |
+| **Linux** | Available (0.1.2), tested on Linux Mint 22 | Tauri 2 (Rust + TypeScript), the system's WebKitGTK | [`.deb` package](https://github.com/toniesteves/tex/releases/latest) |
 
-Todos podem ser trocados em Ajustes › Atalhos. No modo Vim, com o foco no editor, Ctrl+B, D, E, F, H, R, U, V, W e Y
-ficam com o Vim.
+## Why Tex
 
-## Como funciona
+Most LaTeX documents are a folder: a `main.tex`, one file per chapter or section, figures and a `.bib`. Tex is built
+for that folder, and it tries to stay out of the way:
 
-- **Compilação no lugar.** O `latexmk` roda na própria pasta do arquivo principal, então `\input{../macros}`, figuras e
-  `.bib` resolvem exatamente como no disco, mas grava tudo num cache em `~/.cache/tex-editor/`. Cada arquivo com
-  alterações não salvas é copiado para o cache e trocado pelo original com `\declare@file@substitution`, um recurso do
-  próprio LaTeX. Quando dois arquivos do projeto têm o mesmo nome, um pequeno despachante em TeX decide qual versão usar
-  a partir do caminho pedido.
-- **Rust só para o que precisa do sistema.** A camada em Rust (`src-tauri/src/`) lê e grava arquivos, roda o `latexmk`
-  e o `synctex` e observa a pasta. Todo o entendimento de LaTeX fica em TypeScript (`src/`): scanner, índice do projeto,
-  leitura do log, autocompletar e a sincronia por palavra.
+1. **Light.** A 2.7 MB package that uses the web view your system already has. No bundled browser, no Electron.
+2. **Your folder stays clean.** TeX runs in a private cache, so no `.aux`, `.log` or `.synctex.gz` ends up next to your
+   sources, and the text you have not saved yet is compiled without writing it to disk.
+3. **Fast feedback.** About a second after you stop typing, the PDF shows the change and the errors are underlined in
+   the editor, on the right line of the right file.
 
-## Desenvolvimento
+## Main features
 
-Requisitos: Rust (via [rustup](https://rustup.rs)), Node.js 22+, as bibliotecas do WebKitGTK
-(`sudo apt install libwebkit2gtk-4.1-dev build-essential`) e o TeX Live com `latexmk`.
+- **Folders and navigation:** open any folder (or a `.tex`, which opens its folder) or start from a template: Article,
+  Thesis, Presentation (Beamer), Math Notes, Problem Set or Blank. File tree with a context menu, tabs, Quick Open
+  (Ctrl+P) and a document outline that spans every included file, labels included.
+- **Live compilation:** `latexmk` with pdfLaTeX, XeLaTeX or LuaLaTeX, chosen by a `% !TEX program` comment, the
+  project or the default. The main file comes from `% !TEX root`, your choice or automatic detection. Saving (Ctrl+S)
+  or compiling (Ctrl+B) writes the PDF next to the main file.
+- **Errors and warnings in place:** TeX and BibTeX messages underlined at the right line, plus live warnings for
+  undefined references, duplicate labels and citations missing from the bibliography. An Issues panel with filters and
+  the full log.
+- **Two-way SyncTeX, down to the word:** double-click a word in the PDF to land on it in the source; Ctrl+click in the
+  source (or Ctrl+Shift+J) to highlight that word in the PDF. The PDF reloads without flashing and keeps its position.
+- **Autocomplete:** commands, environments (`\begin{` writes the `\end`), `\end{` with the open environment first,
+  labels in `\ref`, keys in `\cite`, files in `\input` and `\includegraphics`, packages, classes, and the commands and
+  environments your own project defines. Inside math, math commands come first.
+- **Beamer presentations (F5):** the audience view full screen on one display and a presenter view with the next slide,
+  Beamer notes, a timer and the clock on the other. With a single display, P shows the presenter view on top.
+- **Writing tools:** Command Palette (Ctrl+Shift+P), editable shortcuts, optional Vim mode, word and page counts, light
+  and dark themes, and an interface in English and Brazilian Portuguese (both follow the system).
+
+<p align="center">
+  <img src="docs/assets/screenshots/sync.png" width="800" alt="Ctrl+click on a word in the source highlights the same word in the PDF">
+</p>
+
+<p align="center">
+  <img src="docs/assets/screenshots/welcome.png" width="640" alt="The Welcome screen with recent projects">
+</p>
+
+## Get Tex
+
+Download the `.deb` from the [latest release](https://github.com/toniesteves/tex/releases/latest) and install it with apt,
+which also installs `latexmk` and a basic TeX Live if they are missing:
+
+```sh
+sudo apt install ./Tex_0.1.2_amd64.deb
+```
+
+Tex appears in the system menu under Office. From a terminal, open a folder or a file:
+
+```sh
+tex-editor ~/thesis
+tex-editor chapter.tex
+```
+
+The command is `tex-editor`, not `tex`, because `tex` is TeX itself (`/usr/bin/tex`, from TeX Live). To uninstall:
+`sudo apt remove tex`.
+
+For biblatex with biber, also install `biber`. Missing LaTeX packages come from apt (`texlive-latex-extra`,
+`texlive-science` and others); on Debian and Linux Mint, `tlmgr` cannot install packages.
+
+### Default shortcuts
+
+| Action | Shortcut | Action | Shortcut |
+|---|---|---|---|
+| Compile (saves everything, writes the PDF) | Ctrl+B | Command Palette | Ctrl+Shift+P |
+| Save / Save All | Ctrl+S / Ctrl+Alt+S | Quick Open | Ctrl+P |
+| Stop compiling | Ctrl+. | Settings | Ctrl+, |
+| Show in PDF | Ctrl+Shift+J | Find / Replace | Ctrl+F / Ctrl+H |
+| Next / previous issue | F8 / Shift+F8 | Go to line | Ctrl+G |
+| Start presentation | F5 | Toggle comment | Ctrl+/ |
+| Show/hide the PDF | Ctrl+Alt+P | Completions | Ctrl+Space (or Tab) |
+| Show/hide Issues | Ctrl+Shift+M | New file / Close tab | Ctrl+N / Ctrl+W |
+| Show/hide the sidebar | Ctrl+Alt+B | Open folder / New project | Ctrl+O / Ctrl+Shift+N |
+| PDF zoom | Ctrl+= / Ctrl+- / Ctrl+0 | Tabs | Ctrl+Tab, Ctrl+1…9 |
+
+Every shortcut can be changed in Settings › Shortcuts. In Vim mode, while the editor has the focus, Ctrl+B, D, E, F, H,
+R, U, V, W and Y belong to Vim.
+
+## How it works
+
+- **Compiling in place.** `latexmk` runs in the main file's own folder, so `\input{../macros}`, figures and `.bib` files
+  resolve exactly as they do on disk, but it writes everything to a cache in `~/.cache/tex-editor/`. Each file with
+  unsaved changes is copied to the cache and swapped in for the original with `\declare@file@substitution`, a feature
+  of the LaTeX kernel. When two files of the project share a name, a small TeX dispatcher picks the right version from
+  the requested path.
+- **Rust only where the system is needed.** The Rust layer reads and writes files, runs `latexmk` and `synctex`, and
+  watches the folder. Everything that understands LaTeX is TypeScript: the scanner, the project index, the log parser,
+  completion and the word-level sync.
+
+## Development
+
+Requirements: Rust (through [rustup](https://rustup.rs)), Node.js 22+, the WebKitGTK development files
+(`sudo apt install libwebkit2gtk-4.1-dev build-essential`) and TeX Live with `latexmk`.
 
 ```sh
 npm install
-npm run tauri dev                      # o app, com recarga automática
-npm run tauri dev -- -- ~/tese         # já abrindo uma pasta
-npm test                               # testes do frontend (vitest)
-(cd src-tauri && cargo test)           # testes do Rust, incluindo compilações reais (pulados sem latexmk)
-npm run tauri build -- --bundles deb   # pacote em src-tauri/target/release/bundle/deb/
+npm run tauri dev                      # the app, with hot reload
+npm run tauri dev -- -- ~/thesis       # opening a folder right away
+npm test                               # frontend tests (vitest)
+(cd src-tauri && cargo test)           # Rust tests, including real compiles (skipped without latexmk)
+npm run tauri build -- --bundles deb   # package in src-tauri/target/release/bundle/deb/
 ```
 
-Ao gerar um pacote novo, suba a versão em `package.json`, `src-tauri/tauri.conf.json` e `src-tauri/Cargo.toml`. Com a
-mesma versão, o apt considera o pacote já instalado e não atualiza.
+Before building a new package, raise the version in `package.json`, `src-tauri/tauri.conf.json` and
+`src-tauri/Cargo.toml`: apt does not upgrade a package to the same version.
 
-### Organização do código
+### Repository structure
 
-| Pasta | Conteúdo |
-|---|---|
-| `src-tauri/src/` | Arquivos, compilação, SyncTeX e observação da pasta (Rust) |
-| `src/latex/` | Scanner, índice do projeto, leitura de log, autocompletar, sincronia por palavra e modelos |
-| `src/editor/` | Editor (CodeMirror 6) e realce de LaTeX |
-| `src/pdf/` | Visualizador de PDF (pdf.js) |
-| `src/present/` | Apresentação: plateia e visão do apresentador |
-| `src/ui/` | Telas: boas-vindas, barra lateral, problemas, paleta, ajustes, novo projeto |
-| `src/project.ts`, `src/app.ts` | Um projeto aberto; os comandos e as janelas |
+```text
+tex/
+├── src/                  the app (TypeScript, no UI framework)
+│   ├── latex/            scanner, project index, log parser, completion catalog, word-level sync, templates
+│   ├── editor/           CodeMirror 6 editor and LaTeX highlighting
+│   ├── pdf/              PDF viewer (pdf.js)
+│   ├── present/          presentation: audience and presenter views
+│   ├── ui/               welcome, sidebar, issues, palette, settings, new project
+│   ├── project.ts        one open project
+│   └── app.ts            commands and windows
+├── src-tauri/            files, compilation, SyncTeX and folder watching (Rust), icons, package settings
+├── docs/assets/          icon and screenshots for this README
+└── README.md  README.pt-BR.md  LICENSE
+```
 
-## Limitações conhecidas
+## Known limitations
 
-- Só Linux. Testado no Linux Mint 22.3 (X11, Cinnamon) com o TeX Live 2023.
-- A apresentação com dois monitores ainda não foi testada numa máquina real; com um monitor, foi.
-- Alterações não salvas em `.bib` só entram na compilação depois de salvar (o BibTeX lê os arquivos direto do disco).
-- Um arquivo não salvo cujo nome tem espaços ou caracteres especiais do TeX compila a versão do disco.
-- Sem verificação ortográfica.
+- Linux only. Tested on Linux Mint 22.3 (X11, Cinnamon) with TeX Live 2023.
+- The two-display presentation has not been tried on a real second display yet; the single-display one has.
+- Unsaved changes to `.bib` files are compiled only after saving (BibTeX reads files straight from disk).
+- An unsaved file whose name has spaces or TeX special characters compiles from its saved version.
+- No spell checking.
+
+## Contributing
+
+Bug reports, ideas and pull requests are welcome, in **English or Portuguese**, through the
+[issues](https://github.com/toniesteves/tex/issues) and pull requests of this repository.
+
+## License
+
+Tex is released under the [MIT License](LICENSE). Copyright © 2026 Toni Esteves.
