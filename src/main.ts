@@ -1,8 +1,9 @@
 // Entry point. Every window runs this page: project windows show the app, the two presentation windows (opened with
-// `?view=audience` or `?view=presenter`) only their own view.
+// `?view=audience` or `?view=presenter`) and the detached PDF (`?view=reader`) only their own view.
 import "./styles/app.css";
 import { App } from "./app";
 import { setLanguage } from "./i18n";
+import { bootReader } from "./pdf/reader";
 import { applyTheme, settings } from "./settings";
 
 async function boot(): Promise<void> {
@@ -15,6 +16,8 @@ async function boot(): Promise<void> {
   if (view === "audience" || view === "presenter") {
     const { bootPresentation } = await import("./present/view");
     await bootPresentation(root, view, params.get("pdf") ?? "", Number(params.get("screens") ?? 1));
+  } else if (view === "reader") {
+    await bootReader(root, params.get("pdf") ?? "");
   } else {
     await new App(root).start();
   }

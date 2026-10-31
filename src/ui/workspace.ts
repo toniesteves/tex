@@ -2,10 +2,11 @@
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { runCommand } from "../commands";
 import { Editor } from "../editor/editor";
-import { locale, t, tn } from "../i18n";
+import { t, tn } from "../i18n";
 import * as ipc from "../ipc";
 import type { Diagnostic } from "../latex/log";
 import { countWords } from "../latex/scan";
+import { closeReader, openReader, pdfControls, reloadReader } from "../pdf/reader";
 import { PdfViewer } from "../pdf/viewer";
 import { Project } from "../project";
 import { settings } from "../settings";
@@ -36,6 +37,7 @@ export class Workspace {
   private cursor = { line: 1, column: 1, selection: "" };
   private vimMode: string | null = null;
   private pdfGeneration = 0;
+  private pdfPath: string | null = null;
   /** Called with the new PDF after every compile that produced one (the presentation follows it). */
   onPdf: ((path: string) => void) | null = null;
 
@@ -103,6 +105,7 @@ export class Workspace {
   dispose(): void {
     this.project.dispose();
     this.viewer.clear();
+    void closeReader(this.project.root);
   }
 
   private renderAll(): void {
@@ -261,12 +264,10 @@ export class Workspace {
   private renderControls(): void {
     const v = this.viewer;
     this.controls.hidden = !v.loaded;
+    const pdf = this.pdfPath;
     this.controls.replaceChildren(
-      h("button", { title: t("Zoom out"), onclick: () => v.zoomOut() }, icon("minus", 14)),
-      h("button", { class: "zoom", title: t("Fit width"), onclick: () => v.fitWidth() }, `${Math.round(v.scale * 100).toLocaleString(locale)}%`),
-      h("button", { title: t("Zoom in"), onclick: () => v.zoomIn() }, icon("plus", 14)),
-      h("button", { title: t("Fit width"), class: v.isFit ? "active" : "", onclick: () => v.fitWidth() }, icon("fit", 14)),
-      h("span", { class: "page" }, `${v.currentPage} / ${v.pageCount}`),
+      ...pdfControls(v),
+      h("button", { class: "detach", title: t("Open in a separate window"), onclick: () => pdf && void openReader(this.project.root, this.project.name, pdf) }, icon("detach", 14)),
     );
   }
 
@@ -274,6 +275,8 @@ export class Workspace {
     const generation = ++this.pdfGeneration;
     const data = await ipc.readBytes(path).catch(() => null);
     if (!data || generation !== this.pdfGeneration) return;
+    this.pdfPath = path;
+    reloadReader(this.project.root, path);
     await this.viewer.load(data).catch((e) => console.error("PDF not shown", e));
     this.renderPlaceholder();
     this.renderStatus();

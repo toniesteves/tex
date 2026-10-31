@@ -80,6 +80,7 @@ export const ptBR: Record<string, string> = {
   "Find": "Localizar",
   "Fit the PDF to the Width": "Ajustar o PDF à Largura",
   "Fit width": "Ajustar à largura",
+  "Open in a separate window": "Abrir em janela separada",
   "Follow the cursor in the PDF": "Acompanhar o cursor no PDF",
   "Font": "Fonte",
   "Font size": "Tamanho da fonte",
