@@ -334,6 +334,17 @@ button.danger { color: var(--error); }
 .editor-pane .cm-editor { flex: 1; height: 100%; min-width: 0; }
 .divider { cursor: col-resize; position: relative; }
 .divider::after { content: ""; position: absolute; top: 0; bottom: 0; left: 3px; width: 1px; background: var(--line); }
+.split, .main { position: relative; }
+
+/* Collapse grips: a chevron pill on each divider hides the panel; an edge tab brings it back. */
+.grip { position: absolute; top: 50%; left: 50%; width: 14px; height: 44px; margin: -22px 0 0 -7px; padding: 0; display: flex; align-items: center; justify-content: center; border: 1px solid var(--line-strong); border-radius: 7px; background: var(--bg-raised); color: var(--fg-3); box-shadow: var(--shadow); cursor: col-resize; z-index: 2; transition: color 0.15s, background 0.15s, border-color 0.15s; }
+.grip:hover { color: var(--on-accent); background: var(--accent); border-color: var(--accent); }
+.grip.flip .icon { transform: rotate(180deg); }
+.grip.edge { display: none; margin-left: 0; cursor: pointer; }
+.grip.edge.left { left: 0; border-left: 0; border-radius: 0 7px 7px 0; }
+.grip.edge.right { left: auto; right: 0; border-right: 0; border-radius: 7px 0 0 7px; }
+.workspace.no-sidebar .grip.edge.left, .split.no-pdf .grip.edge.right { display: flex; }
+.divider:hover::after { background: var(--accent); }
 
 /* ── Editor (colours live in the CodeMirror theme in src/editor/editor.ts) ── */
 .cm-editor.cm-focused { outline: none; }

@@ -1,6 +1,6 @@
 [package]
 name = "tex-editor"
-version = "0.1.18"
+version = "0.1.20"
 description = "Tex: a light LaTeX editor for Linux"
 edition = "2021"
 rust-version = "1.90"

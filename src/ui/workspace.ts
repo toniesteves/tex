@@ -54,12 +54,13 @@ export class Workspace {
     project.editor = this.editor;
     this.sidebar = new Sidebar(project, this.fileActions());
     this.issues = new IssuesPanel(project, (d) => this.jumpTo(d), () => this.toggleIssues(false));
-    const divider = h("div", { class: "divider", title: t("Drag to resize") });
+    const divider = h("div", { class: "divider", title: t("Drag to resize") }, this.grip(t("Hide PDF"), "", () => this.togglePdf(false)));
     this.pdfPane.append(this.viewer.el, this.placeholder, this.controls);
-    this.split.append(editorPane, divider, this.pdfPane);
+    this.split.append(editorPane, divider, this.pdfPane, this.grip(t("Show PDF"), "edge right flip", () => this.togglePdf(true)));
     this.el.append(
       this.sidebar.el,
-      h("div", { class: "main" }, h("header", { class: "toolbar" }, Object.assign(this.button("file.closeProject", "home", t("Close Project")), { className: "tool home" }), this.title, this.tools), this.tabs, this.banners, this.split, this.issues.el, this.status),
+      h("div", { class: "main" }, h("header", { class: "toolbar" }, Object.assign(this.button("file.closeProject", "home", t("Close Project")), { className: "tool home" }), this.title, this.tools), this.tabs, this.banners, this.split, this.issues.el, this.status,
+        this.grip(t("Show Sidebar"), "edge left", () => this.toggleSidebar())),
     );
     this.resizable(divider);
     this.resizableSidebar();
@@ -280,40 +281,50 @@ export class Workspace {
   }
 
   private resizable(divider: HTMLElement): void {
-    divider.addEventListener("pointerdown", (e) => {
-      divider.setPointerCapture(e.pointerId);
-      const box = this.split.getBoundingClientRect();
-      const move = (ev: PointerEvent) => {
-        const ratio = Math.min(0.85, Math.max(0.15, (ev.clientX - box.left) / box.width));
-        this.split.style.setProperty("--split", String(ratio));
-      };
-      const up = () => {
-        divider.removeEventListener("pointermove", move);
-        settings.updateProject(this.project.root, { split: Number(this.split.style.getPropertyValue("--split")) });
-      };
-      divider.addEventListener("pointermove", move);
-      divider.addEventListener("pointerup", up, { once: true });
-    });
+    let box = this.split.getBoundingClientRect();
+    this.drag(divider, () => (box = this.split.getBoundingClientRect()), (x) => {
+      const ratio = Math.min(0.85, Math.max(0.15, (x - box.left) / box.width));
+      this.split.style.setProperty("--split", String(ratio));
+    }, () => settings.updateProject(this.project.root, { split: Number(this.split.style.getPropertyValue("--split")) }));
   }
 
   private resizableSidebar(): void {
-    const handle = h("div", { class: "sidebar-handle", title: t("Drag to resize") });
+    const handle = h("div", { class: "sidebar-handle", title: t("Drag to resize") }, this.grip(t("Hide Sidebar"), "flip", () => this.toggleSidebar()));
     this.sidebar.el.append(handle);
+    let left = 0;
     let width = 0;
+    this.drag(handle, () => (left = this.sidebar.el.getBoundingClientRect().left), (x) => {
+      width = Math.round(Math.min(600, Math.max(160, x - left)));
+      this.el.style.setProperty("--sidebar-width", `${width}px`);
+    }, () => width && settings.updateProject(this.project.root, { sidebarWidth: width }));
+  }
+
+  /** Drags a divider; a press on its grip that does not move counts as a click on the grip. */
+  private drag(handle: HTMLElement, start: () => void, move: (x: number) => void, done: () => void): void {
+    // Mouse clicks on the grip are decided on pointerup below; the keyboard still clicks it (detail 0).
+    handle.addEventListener("click", (e) => e.detail > 0 && e.stopPropagation(), true);
     handle.addEventListener("pointerdown", (e) => {
       handle.setPointerCapture(e.pointerId);
-      const left = this.sidebar.el.getBoundingClientRect().left;
-      const move = (ev: PointerEvent) => {
-        width = Math.round(Math.min(600, Math.max(160, ev.clientX - left)));
-        this.el.style.setProperty("--sidebar-width", `${width}px`);
+      const grip = (e.target as Element).closest<HTMLElement>(".grip");
+      let dragging = false;
+      start();
+      const onMove = (ev: PointerEvent) => {
+        dragging ||= Math.abs(ev.clientX - e.clientX) > 3;
+        if (dragging) move(ev.clientX);
       };
       const up = () => {
-        handle.removeEventListener("pointermove", move);
-        if (width) settings.updateProject(this.project.root, { sidebarWidth: width });
+        handle.removeEventListener("pointermove", onMove);
+        if (dragging) done();
+        else grip?.click();
       };
-      handle.addEventListener("pointermove", move);
+      handle.addEventListener("pointermove", onMove);
       handle.addEventListener("pointerup", up, { once: true });
     });
+  }
+
+  /** A chevron pill that collapses a panel from its divider (click) or resizes it (drag), or ("edge") brings a hidden one back. */
+  private grip(label: string, variant: string, run: () => void): HTMLButtonElement {
+    return h("button", { class: `grip ${variant}`, title: label, "aria-label": label, onclick: run }, icon("chevron", 12));
   }
 
   // ── Panels ──────────────────────────────────────────────────────────────────────────────────────────────────────
