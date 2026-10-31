@@ -5,7 +5,7 @@ import { defaultKeymap, history, historyKeymap, indentLess, indentMore, toggleCo
 import { bracketMatching, indentUnit } from "@codemirror/language";
 import { lintGutter, lintKeymap, setDiagnostics, type Diagnostic as CmDiagnostic } from "@codemirror/lint";
 import { gotoLine, highlightSelectionMatches, openSearchPanel, searchKeymap } from "@codemirror/search";
-import { Compartment, EditorSelection, EditorState, StateEffect, StateField, type Extension, type Text } from "@codemirror/state";
+import { Compartment, EditorSelection, EditorState, Prec, StateEffect, StateField, type Extension, type Text } from "@codemirror/state";
 import {
   Decoration, drawSelection, dropCursor, EditorView, highlightActiveLine, highlightActiveLineGutter, keymap, lineNumbers,
   type Command, type DecorationSet, type KeyBinding,
@@ -91,6 +91,19 @@ const tab: Command = (view) => {
   view.dispatch(state.replaceSelection(state.facet(indentUnit)), { scrollIntoView: true, userEvent: "input" });
   return true;
 };
+
+/** WebKit queues every auto-repeated key until the page has handled the previous one, so when drawing falls behind the
+ * repeat rate a held arrow key keeps moving long after it is released. Repeats that waited longer than this are
+ * dropped, only while their timestamps advance, in case a backend stamps every repeat with the time of the first press. */
+const STALE_REPEAT_MS = 100;
+let lastKeyStamp = 0;
+const dropStaleRepeats = Prec.highest(EditorView.domEventHandlers({
+  keydown(event) {
+    const advancing = event.timeStamp > lastKeyStamp;
+    lastKeyStamp = event.timeStamp;
+    return event.repeat && advancing && performance.now() - event.timeStamp > STALE_REPEAT_MS;
+  },
+}));
 
 /** The word at or right before `pos` (a control word counts without its backslash). */
 export function wordAt(doc: Text, pos: number): { word: string; from: number; to: number } | null {
@@ -216,6 +229,7 @@ export class Editor {
       latexHighlighting,
       lintGutter(),
       flashField,
+      dropStaleRepeats,
       keymap.of([{ key: "Tab", run: tab, shift: indentLess }, { key: "Enter", run: closeEnvironment }, ...builtInKeys]),
       EditorView.contentAttributes.of({ spellcheck: "false", autocorrect: "off", autocapitalize: "off" }),
       EditorView.domEventHandlers({
